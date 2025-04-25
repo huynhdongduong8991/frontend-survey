@@ -15,6 +15,7 @@ import {
 } from "@/utility/storage";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
+import Header from "./layouts/MainLayout/Header";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -22,10 +23,16 @@ interface ProtectedRouteProps {
 
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   const router = useRouter();
+  const [isLogged, setIsLogged] = useState(false);
   const [user, setUser] = useState<IUser>(null);
   const [loading, setLoading] = useState(false);
-  const { GOOGLE_LOGIN, LOGOUT, LOGIN, REGISTER, RESET_PASSWORD } =
-    useAuthApi();
+  const { 
+    GOOGLE_LOGIN, 
+    LOGOUT, 
+    LOGIN, 
+    REGISTER, 
+    RESET_PASSWORD
+  } = useAuthApi();
 
   useEffect(() => {
     const handleAuthentication = () => {
@@ -33,10 +40,9 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
       const token = dataURL.get("token");
 
       if (token) {
-        console.log({ token });
         setTokenStorage({ accessToken: token, refreshToken: "" });
         setLoading(true);
-        router.push(ROUTES.HOME);
+        router.push(ROUTES.CREATE_SURVEY);
         return;
       }
 
@@ -45,12 +51,19 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
         router.push(ROUTES.LOGIN);
       } else {
         setLoading(true);
-        router.push(ROUTES.HOME);
+        router.push(ROUTES.CREATE_SURVEY);
       }
     };
 
     handleAuthentication();
   }, []);
+
+  useEffect(() => {
+    const accessToken = getTokenStorage();
+    if (accessToken) {
+      setIsLogged(true);
+    }
+  }, [loading]);
 
   const googleLogin = async () => {
     await GOOGLE_LOGIN();
@@ -60,7 +73,8 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
     const data = await LOGIN(payload);
     setTokenStorage({ accessToken: data.accessToken, refreshToken: "" });
     setLoading(true);
-    router.push(ROUTES.HOME);
+    setIsLogged(true);
+    router.push(ROUTES.CREATE_SURVEY);
   };
 
   const register = async (payload: IUserRegister) => {
@@ -84,6 +98,7 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
     await LOGOUT();
     setUser(null);
     cleanTokenStorage();
+    setIsLogged(false);
     router.push(ROUTES.LOGIN);
   };
 
@@ -101,6 +116,7 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
         resetPassword,
       }}
     >
+      {isLogged && <Header />}
       {children}
     </AuthContext.Provider>
   );

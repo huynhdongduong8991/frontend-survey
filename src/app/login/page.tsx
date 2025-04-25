@@ -17,7 +17,7 @@ import GoogleIcon from '@mui/icons-material/Google'
 
 const loginSchema = z.object({
   email: z.string().min(1, "Email is required").email("Invalid email address"),
-  password: z.string(),
+  password: z.string().nonempty("Password invalid"),
 });
 
 type LoginFormInputs = z.infer<typeof loginSchema>;
