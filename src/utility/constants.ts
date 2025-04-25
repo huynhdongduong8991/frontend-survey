@@ -1,7 +1,7 @@
 export const ROUTES = {
-  HOME: "/",
+  HOME: "/dashboard",
   LOGIN: "/login",
   LOGOUT: "/logout",
   SURVEYS: "/surveys",
-  CREATE_SURVEY: "/surveys/create",
+  CREATE_SURVEY: "/dashboard/create-survey",
 };

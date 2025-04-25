@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
-import HomePage from "./home/page";
+import CreateSurvey from "./dashboard/create-survey/page";
 
 export default function Home() {
-    return <React.Fragment><HomePage /></React.Fragment>;
+    return <React.Fragment><CreateSurvey /></React.Fragment>;
 };
