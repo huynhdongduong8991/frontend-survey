@@ -1,4 +1,4 @@
-import { IUserLogin, IUserRegister, IUserResetPassword } from "@/interface/user";
+import { IUserLogin, IUserRegister, IUserResetPassword } from "@/interface/user.interface";
 import { createContext, Dispatch, SetStateAction } from "react";
 
 export interface IUser {
@@ -6,7 +6,7 @@ export interface IUser {
     userId: string;
     userGoogleId: string;
     email: string;
-    name: string;
+    username: string;
     createdAt: string;
     updatedAt: string;
 }

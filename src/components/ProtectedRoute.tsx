@@ -6,7 +6,7 @@ import {
   IUserLogin,
   IUserRegister,
   IUserResetPassword,
-} from "@/interface/user";
+} from "@/interface/user.interface";
 import { ROUTES } from "@/utility/constants";
 import {
   cleanTokenStorage,
@@ -16,6 +16,7 @@ import {
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import Header from "./layouts/MainLayout/Header";
+import { useUserApi } from "@/api/user";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -33,6 +34,7 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
     REGISTER, 
     RESET_PASSWORD
   } = useAuthApi();
+  const { GET_USER } = useUserApi();
 
   useEffect(() => {
     const handleAuthentication = () => {
@@ -42,7 +44,7 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
       if (token) {
         setTokenStorage({ accessToken: token, refreshToken: "" });
         setLoading(true);
-        router.push(ROUTES.CREATE_SURVEY);
+        router.push(ROUTES.HOME);
         return;
       }
 
@@ -51,7 +53,7 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
         router.push(ROUTES.LOGIN);
       } else {
         setLoading(true);
-        router.push(ROUTES.CREATE_SURVEY);
+        router.push(ROUTES.HOME);
       }
     };
 
@@ -60,21 +62,42 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
 
   useEffect(() => {
     const accessToken = getTokenStorage();
+    const fechUser = async () => {
+      try {
+        const user = await GET_USER();
+        const userData = user.data as IUser;
+        setUser(userData);
+      } catch (error) {
+        console.error("Error during fetching user", error);
+      }
+    };
     if (accessToken) {
+      fechUser();
       setIsLogged(true);
     }
   }, [loading]);
 
   const googleLogin = async () => {
-    await GOOGLE_LOGIN();
+    try {
+      await GOOGLE_LOGIN();
+    } catch (error) {
+      console.error("Error during login", error);
+    }
   };
 
   const login = async (payload: IUserLogin) => {
-    const data = await LOGIN(payload);
-    setTokenStorage({ accessToken: data.accessToken, refreshToken: "" });
-    setLoading(true);
-    setIsLogged(true);
-    router.push(ROUTES.CREATE_SURVEY);
+    try {
+      const data = await LOGIN(payload);
+
+      if (data.success) {
+        setTokenStorage({ accessToken: data.accessToken, refreshToken: "" });
+        setLoading(true);
+        setIsLogged(true);
+        router.push(ROUTES.HOME);
+      }
+    } catch (error) {
+      console.error("Error during login", error);
+    }
   };
 
   const register = async (payload: IUserRegister) => {
@@ -96,9 +119,9 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
 
   const logout = async () => {
     await LOGOUT();
+    setIsLogged(false);
     setUser(null);
     cleanTokenStorage();
-    setIsLogged(false);
     router.push(ROUTES.LOGIN);
   };
 
