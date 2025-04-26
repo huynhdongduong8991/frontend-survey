@@ -2,7 +2,7 @@ import {
   IUserLogin,
   IUserRegister,
   IUserResetPassword,
-} from "@/interface/user";
+} from "@/interface/user.interface";
 import { privateApi, publicApi, googleApi } from "./base";
 
 const subPath = "auth";

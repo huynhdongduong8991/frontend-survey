@@ -1,4 +1,4 @@
-export const surveyJSON = {
+export const surveySchemaJSON = {
   title: "NPS Survey Question",
   logo: "https://surveyjs.io/Content/Images/examples/logo.png",
   logoHeight: "60px",
