@@ -26,7 +26,7 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   const router = useRouter();
   const [isLogged, setIsLogged] = useState(false);
   const [user, setUser] = useState<IUser>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const { 
     GOOGLE_LOGIN, 
     LOGOUT, 
@@ -43,7 +43,7 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
 
       if (token) {
         setTokenStorage({ accessToken: token, refreshToken: "" });
-        setLoading(true);
+        setLoading(false);
         router.push(ROUTES.HOME);
         return;
       }
@@ -52,9 +52,9 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
       if (!tokenStorage.accessToken) {
         router.push(ROUTES.LOGIN);
       } else {
-        setLoading(true);
         router.push(ROUTES.HOME);
       }
+      setLoading(false);
     };
 
     handleAuthentication();
@@ -91,7 +91,7 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
 
       if (data.success) {
         setTokenStorage({ accessToken: data.accessToken, refreshToken: "" });
-        setLoading(true);
+        setLoading(false);
         setIsLogged(true);
         router.push(ROUTES.HOME);
       }

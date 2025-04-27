@@ -4,7 +4,6 @@ import Box from "@mui/material/Box";
 import { useEffect, useState } from "react";
 import { Model } from "survey-core";
 import { Survey } from "survey-react-ui";
-import Loading from "./FLoading";
 
 interface SubmissionProps {
   surveyId: number;
@@ -17,20 +16,22 @@ export const SubmissionForm = ({ surveyId }: SubmissionProps) => {
 
   useEffect(() => {
     const fetchSurvey = async () => {
-      const res = await GET_SURVEY(surveyId);
+      if (surveyId) {
+        const res = await GET_SURVEY(surveyId);
 
-      if (res.data) {
-        const questions = res.data.questions;
-        const surveyJson = {
-          pages: Array.from(questions).map((item: any) => ({
-            name: item.name,
-            elements: item.elements,
-          })),
-        };
+        if (res.data) {
+          const questions = res.data.questions;
+          const surveyJson = {
+            pages: Array.from(questions).map((item: any) => ({
+              name: item.name,
+              elements: item.elements,
+            })),
+          };
 
-        const survey = new Model(surveyJson);
-        survey.onComplete.add(onComplete);
-        setSurveyModel(survey);
+          const survey = new Model(surveyJson);
+          survey.onComplete.add(onComplete);
+          setSurveyModel(survey);
+        }
       }
     };
     fetchSurvey();
@@ -45,9 +46,5 @@ export const SubmissionForm = ({ surveyId }: SubmissionProps) => {
     }
   };
 
-  return (
-    <Box sx={{ p: 2 }}>
-      {!surveyModel ? <Loading /> : <Survey model={surveyModel} />}
-    </Box>
-  );
+  return <Box>{!surveyModel ? null : <Survey model={surveyModel} />}</Box>;
 };

@@ -15,23 +15,29 @@ import {
   Typography
 } from "@mui/material";
 import { useRouter } from "next/navigation";
-import { useContext, useState } from "react";
+import { ChangeEvent, useContext, useState } from "react";
 
 export default function Dashboard() {
   const router = useRouter();
-  const [filter, setFilter] = useState("");
+  const [query, setQuery] = useState("");
   const [selectedSurvey, setSelectedSurvey] = useState<number | null>(null);
-  const { setLoading, user } = useContext(AuthContext);
-  const { data: surveysData } = useSurvey(user?.email);
+  const { loading, setLoading, user } = useContext(AuthContext);
+  const { data, mutate } = useSurvey(user?.email, query);
 
   const handleRedirectSurveyCreator = () => {
     setLoading(true);
     router.push(ROUTES.HOME + ROUTES.CREATE_SURVEY);
   };
 
+  const handleQuerySurvey = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setQuery(value);
+    mutate();
+  }
+
   return (
     <>
-      {surveysData.length === 0 ? (
+      {loading ? (
         <Loading />
       ) : (
         <Box sx={{ p: 4 }}>
@@ -43,17 +49,38 @@ export default function Dashboard() {
           </Button>
           <TextField
             label="Filter Surveys"
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
+            value={query}
+            onChange={handleQuerySurvey}
             fullWidth
             margin="normal"
           />
-          <List>
-            {surveysData.map((survey) => (
-              <FListItem key={survey.id} data={survey} onSelect={setSelectedSurvey}  />
-            ))}
-          </List>
-          {selectedSurvey && <SubmissionForm surveyId={selectedSurvey} />}
+          {data.surveys.length === 0 ? (
+            <Box
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+              justifyContent="center"
+              p={4}
+              color="text.secondary"
+            >
+              <Typography variant="h5" gutterBottom>No Data Available</Typography>
+            </Box>
+          ) : (
+            <List>
+              {data.surveys.map((survey) => (
+                <FListItem 
+                  key={survey.id} 
+                  data={survey}
+                  isSelected={selectedSurvey !== null ? survey.id !== selectedSurvey : false}
+                  onSelect={setSelectedSurvey}
+                  isUseDownloadReport={true}
+                  mutate={mutate}
+                >
+                  <SubmissionForm surveyId={selectedSurvey} />
+                </FListItem>
+              ))}
+            </List>
+          )}
         </Box>
       )}
     </>

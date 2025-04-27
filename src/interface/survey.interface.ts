@@ -10,5 +10,8 @@ export type Survey = {
 
 export interface ISurveyResponse {
   success: boolean;
-  data: Survey[];
+  data: {
+    surveys: Survey[],
+    totalItem: number,
+  }
 }

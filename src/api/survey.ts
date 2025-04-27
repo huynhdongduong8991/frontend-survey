@@ -20,5 +20,9 @@ export const useSurveyApi = () => {
     return response.data;
   };
 
-  return { GET_SURVEYS, CREATE_SURVEY, GET_SURVEY };
+  const DELETE_SURVEY = async (surveyId: string) => {
+    await privateAPI.delete(`/${surveyId}`);
+  };
+
+  return { GET_SURVEYS, CREATE_SURVEY, GET_SURVEY, DELETE_SURVEY };
 };
