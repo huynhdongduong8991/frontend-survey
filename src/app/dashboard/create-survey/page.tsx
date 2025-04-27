@@ -2,17 +2,20 @@
 
 import { useSurveyApi } from "@/api/survey";
 import Loading from "@/components/FLoading";
-import { Button, Container, TextField, Typography } from "@mui/material";
+import { Button, Container, Typography } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
 import { surveySchemaJSON } from "./create-survey-schema";
 import { SurveyCreator, SurveyCreatorComponent } from "survey-creator-react";
 import SurveyCreatorTheme from "survey-creator-core/themes";
 import { registerCreatorTheme } from "survey-creator-core";
 import { AuthContext } from "@/context/auth-context";
+import { useRouter } from "next/navigation";
+import { ROUTES } from "@/utility/constants";
 
 registerCreatorTheme(SurveyCreatorTheme);
 
 const CreateSurvey = () => {
+  const router = useRouter();
   const { setLoading } = useContext(AuthContext);
   const { CREATE_SURVEY } = useSurveyApi();
   const [creator, setCreator] = useState<SurveyCreator | null>(null);
@@ -34,8 +37,10 @@ const CreateSurvey = () => {
         title: schema?.title,
         questions: questions,
       }
-      console.log({ payload });
       const data = await CREATE_SURVEY(payload);
+      if (data.success) {
+        router.push(ROUTES.HOME);
+      }
     } catch (error) {
       console.error("Error saving survey:", error);
     }
